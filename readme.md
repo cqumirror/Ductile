@@ -1,2 +1,2 @@
-# Ductile: A mirror changing tool from modern distributions
+# Ductile: A mirror changing tool for modern distributions
 

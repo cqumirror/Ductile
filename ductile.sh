@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/bin/bash
+# set -x
+# set -v
 #	Ductile.sh - Tools to change mirror for modern distributions
 #
 #	Copyright (c) 2022 CQULanunion Operation and Maintenance Team <cqumirror@gmail.com>
@@ -226,7 +228,7 @@ fi
 
 # import system information, don't source when release this script
 # Get distro ID
-DISTRO_ID=`grep -rw '/etc/os-release' -e "ID" | cut -d "=" -f2`
+DISTRO_ID=$(grep -rw '/etc/os-release' -e "ID" | cut -d "=" -f2)
 echo() { printf '%s\n' "$*"; }
 
 ## TODO
@@ -266,6 +268,34 @@ starter_busybox() {
 	done
 }
 
+prepare_archlinux() {
+	REPO_FILE_DIR='/etc/pacman.d'
+	REPO_FILE=mirrorlist
+	echo "==> Arch Linux Detected."
+	cd $REPO_FILE_DIR
+	cp $REPO_FILE $REPO_FILE.bak
+	sed '/^## Generated.*/a ##\n## China\nServer = http://mirrors.cqu.edu.cn/archlinux/$repo/os/$arch' $REPO_FILE.bak > $REPO_FILE
+	pacman -Syy
+	exit
+}
+
+
+prepare_debian() {
+	echo "pm is apt"
+	apt --version
+	exit
+}
+
+get_pm() {
+	case "$DISTRO_ID" in
+		arch)	prepare_archlinux;;
+		debian)	prepare_debian;;
+		ubuntu)	echo "pm is apt"; PM=apt; exit;;
+		fedora) echo "pm is dnf"; PM=dnf; exit;;
+		\"opensuse-leap\")	echo "pm is zypp"; exit;;
+		\"opensuse-tumbleweed\")	echo "pm is zypp"; exit;;
+	esac
+}
 
 
 if [[ $DISTRO_ID == *"openwrt"* ]] ; then
@@ -282,19 +312,25 @@ else
 	printf -- "$(gettext "Options:")\n"
 	printf -- "$(gettext "  -V, --version		Show version information and exit")\n"
 	echo
-	printf -- "$(gettext "  -m, --mirror		This a description.")\n"
+	printf -- "$(gettext "  -m, --mirror		Specific a mirror to use.")\n"
 	echo
-	printf -- "$(gettext "  -h, --help		This a description.")\n"
+	printf -- "$(gettext "  -h, --help		Show help information and exit.")\n"
 	echo
-	printf -- "$(gettext "  -c, --config		This a description.")\n"
+	printf -- "$(gettext "  -c, --config		Read config from config file.")\n"
 	echo
-	printf -- "$(gettext "  -R, --refresh		This a description.")\n"
+	printf -- "$(gettext "  -R, --refresh		Automatically refresh repo database.")\n"
 	echo
-	printf -- "$(gettext "  -V, --verbose		This a description.")\n"
+	printf -- "$(gettext "  -V, --verbose		Dry run this scripts and show things to change without applying changes.")\n"
 	echo
-	printf -- "$(gettext "  -r, --recommand	This a description.")\n"
+	printf -- "$(gettext "  -r, --recommand	Add recommanded repos like archlinuxcn for Arch Linux.")\n"
 	echo
-	printf -- "$(gettext "  -p, --pm		This a description.")\n"
+	printf -- "$(gettext "  -p, --pm		Specify the package manager individually.")\n"
+	echo
+	printf -- "$(gettext "  -i, --ask		Run interactively.")\n"
+	echo
+	printf -- "$(gettext "  -U, --offline		Run scritps offline.")\n"
+	echo
+	printf -- "$(gettext "  -S, --speed		Run mirror speedtest and choose the fastest one.")\n"
 	echo
 	}
 
@@ -318,12 +354,13 @@ else
 			printf "%s\n" "$@"
 		}
 	fi
-
+	
 	ARGLIST=("$@")
 
 	# Parse Command Line Options.
-	OPT_SHORT="chpm:vRVr"
-	OPT_LONG=('help' 'mirror' 'config' 'refresh' 'verbose' 'recommand' 'pm' 'version')
+	OPT_SHORT="chpm:SUivRVr"
+	# Options need argueents will need to add ":" after the long options. Like mirror -> "mirror:"
+	OPT_LONG=('offline' 'speed' 'help' 'mirror:' 'config:' 'refresh' 'verbose' 'recommand' 'pm:' 'version' 'ask')
 
 # 	# Pacman Options
 # 	OPT_LONG+=('asdeps' 'noconfirm' 'needed' 'noprogressbar')
@@ -334,16 +371,22 @@ else
 	set -- "${OPTRET[@]}"
 	unset OPT_SHORT OPT_LONG OPTRET
 
+	
 	while true; do
 		case "$1" in
 			# Makepkg Options
-			-h|--help)        usage; exit $E_OK ;;
-			-v|--version)     version; exit $E_OK ;;
-
-			--)               shift; break ;;
+			-h|--help)		usage; exit $E_OK ;;
+			-v|--version)	version; exit $E_OK ;;
+			-V|--verbose)	TEST_ONLY=1;;
+			-m|--mirror)	shift; MIRROR=$1 ;;
+			-i|--ask)		echo "ask" ;;
+			--)				shift; break ;;
 		esac
 		shift
 	done
 fi
+
+# get_pm
+
 
 

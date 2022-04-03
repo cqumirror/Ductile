@@ -1,0 +1,7 @@
+--mirror abc -V
+4
+--mirror -V -- abc
+2
+-- abc
+-V
+

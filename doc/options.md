@@ -5,7 +5,7 @@
 | v            | version     | Get version of this scripts..                                | version()            | No                   |                                                        |
 | m            | mirror      | Specific a mirror to use.                                    | MIRROR               | Yes                  | get mirror list from file or mirrorz.org?              |
 | h            | help        | Show help information and exit.                              | usage()              | No(But Yes actually) |                                                        |
-| c            | config      | Read file from config file.                                  |                      | Yes                  |                                                        |
+| c            | config      | Read config from config file.                                |                      | Yes                  |                                                        |
 | R            | refresh     | Automatically refresh repo database.                         |                      | No                   |                                                        |
 | V            | verbose     | Dry run this scripts and show things to change without applying changes. |                      | No                   |                                                        |
 | r            | recommand   | Add recommanded repos like `archlinuxcn` for Arch Linux.     |                      | No                   |                                                        |

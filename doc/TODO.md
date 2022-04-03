@@ -1,0 +1,4 @@
+- [ ] Detect package manager
+- [ ] Backup of original files
+- [ ] Get mirror list, online: from mirrorz or github release? offline: from file or from args?
+- [ ] 

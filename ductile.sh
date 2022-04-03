@@ -219,6 +219,15 @@ OS_RELEASE=/etc/os-release
 ERROR_LOG_DIR=/var/log/
 VERSION=0.0.1
 
+# Hard coded mirror list, for we cannot find a way to get all the urls online
+# Format: site-code=['site-url','mirror_name_a','mirror_name_b',...]
+# from A-Z. Pick the distribution we can use. Test using archlinux
+mirrors=(bfsu bupt cqu tuna)
+bfsu=(http://mirrors.bfsu.edu.cn archlinux)
+bupt=(http://mirrors.bupt.edu.cn archlinux)
+cqu=(http://mirrors.cqu.edu.cn archlinux)
+tuna=(http://mirrors.tuna.tsinghua.edu.cn archlinux)
+
 # Check is os-release exists
 if [ ! -f $OS_RELEASE ];then
     	echo "Seems os-release does not exist, you should either specific package manager or report this in issse"
@@ -286,6 +295,8 @@ prepare_debian() {
 	exit
 }
 
+## TODO
+# Need to expand other distribution ids
 get_pm() {
 	case "$DISTRO_ID" in
 		arch)	prepare_archlinux;;
@@ -386,7 +397,23 @@ else
 	done
 fi
 
-# get_pm
+
+## workaround by Hagb_Green
+# Usage:
+# check_contains value "${array[@]}"
+check_contains() {
+	value=$1
+	shift
+	for i in "$@"; do
+		[ "$i" == "$value" ] && return 0
+	done
+	echo "Site abbr or distro name not exist or cannot be precessed."
+	exit 1
+}
+
+## Check if abbr exists
+
+if [ -z "$MIRROR" ]; then echo "==> Mirror is not specific. Abort..." && exit 1; else check_contains $MIRROR "${mirrors[@]}"; fi
 
 
 

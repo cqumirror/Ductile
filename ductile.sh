@@ -277,14 +277,31 @@ starter_busybox() {
 	done
 }
 
+## workaround by Hagb_Green
+# Usage:
+# check_contains value "${array[@]}"
+check_contains() {
+	value=$1
+	shift
+	for i in "$@"; do
+		[ "$i" == "$value" ] && return 0
+	done
+	echo "Site abbr or distro name not exist or cannot be precessed."
+	exit 1
+}
+
 prepare_archlinux() {
 	REPO_FILE_DIR='/etc/pacman.d'
 	REPO_FILE=mirrorlist
 	echo "==> Arch Linux Detected."
+	echo
 	cd $REPO_FILE_DIR
 	cp $REPO_FILE $REPO_FILE.bak
-	sed '/^## Generated.*/a ##\n## China\nServer = http://mirrors.cqu.edu.cn/archlinux/$repo/os/$arch' $REPO_FILE.bak > $REPO_FILE
+	eval SITE=\${$MIRROR[0]}
+	sed "/^## Generated.*/a ##\n## China\nServer = $SITE/archlinux/\$repo/os/\$arch" $REPO_FILE.bak > $REPO_FILE
 	pacman -Syy
+	echo
+	echo "Done"
 	exit
 }
 
@@ -297,9 +314,20 @@ prepare_debian() {
 
 ## TODO
 # Need to expand other distribution ids
+# Steps:
+#	- Get array containing site information with the variable value from a dynamically named variable 
+#	- Check mirror existance
+#	- Action
+#
+#
 get_pm() {
 	case "$DISTRO_ID" in
-		arch)	prepare_archlinux;;
+		arch)
+			eval temp_var=\${$MIRROR[@]}
+			echo $temp_var
+			check_contains archlinux $temp_var 
+			prepare_archlinux
+			;;
 		debian)	prepare_debian;;
 		ubuntu)	echo "pm is apt"; PM=apt; exit;;
 		fedora) echo "pm is dnf"; PM=dnf; exit;;
@@ -398,22 +426,14 @@ else
 fi
 
 
-## workaround by Hagb_Green
-# Usage:
-# check_contains value "${array[@]}"
-check_contains() {
-	value=$1
-	shift
-	for i in "$@"; do
-		[ "$i" == "$value" ] && return 0
-	done
-	echo "Site abbr or distro name not exist or cannot be precessed."
-	exit 1
-}
-
 ## Check if abbr exists
 
 if [ -z "$MIRROR" ]; then echo "==> Mirror is not specific. Abort..." && exit 1; else check_contains $MIRROR "${mirrors[@]}"; fi
 
+# Check root privilege
+if [[ $EUID -ne 0 ]]; then echo "This script must be run as root" && exit 1; fi
 
+echo "Start default mirror replacement with $MIRROR ..."
 
+# Name may change. Due to the function do more than just get pm name.
+get_pm

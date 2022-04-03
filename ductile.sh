@@ -1,5 +1,9 @@
 #!/bin/sh
-
+#	Ductile.sh - Tools to change mirror for modern distributions
+#
+#	Copyright (c) 2022 CQULanunion Operation and Maintenance Team <cqumirror@gmail.com>
+#	Lanunion of Chongqing University ( 2011 - 2022 ) All Rights Reserved.
+#	
 ##  Using parseopts from archlinux 
 #   parseopts.sh - getopt_long-like parser
 #
@@ -225,7 +229,7 @@ fi
 DISTRO_ID=`grep -rw '/etc/os-release' -e "ID" | cut -d "=" -f2`
 echo() { printf '%s\n' "$*"; }
 
-
+## TODO
 starter_busybox() {
 	# CLI options for distributions like openwrt which uses busybox by default
 	optspec="-:vchm"

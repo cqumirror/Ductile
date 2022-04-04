@@ -23,6 +23,7 @@ VERSION=0.0.1
 TMP_DIR=/tmp
 IS_TEST=1
 DO_REFRESH=1
+ONLINE=0
 
 
 ##  Using parseopts from archlinux 
@@ -300,14 +301,14 @@ prepare_archlinux() {
 	echo "==> Arch Linux Detected."
 	echo
 	cd $REPO_FILE_DIR
-	eval SITE=\${$MIRROR[0]}
+	if (( ! $ONLINE )); then eval SITE=\${$MIRROR[0]}; else SITE=$MIRROR; fi
 	if (( $IS_TEST )) ; then 
 		echo "==> Performing backup..."
 		cp $REPO_FILE $REPO_FILE.bak
-		echo "==> Backup original file at $REPO_FILE_DIR/$REPO_FILE.bak ."
+		echo "==> Backup original file at $REPO_FILE_DIR/$REPO_FILE.bak"
 		echo "==> Performing replacement..."
 		sed "/^## Generated.*/a ##\n## China\nServer = $SITE/archlinux/\$repo/os/\$arch" $REPO_FILE.bak > $REPO_FILE
-		if (( $DO_REFRESH )) ; then echo && echo "Done"; exit; else pacman -Syy; echo && echo "Done"; exit; fi
+		if (( $DO_REFRESH )) ; then echo "Do sudo pacman -Syy to update database."; echo && echo "Done"; exit; else pacman -Syy; echo && echo "Done"; exit; fi
 	else
 		sed "/^## Generated.*/a ##\n## China\nServer = $SITE/archlinux/\$repo/os/\$arch" $REPO_FILE > $TMP_DIR/$REPO_FILE
 		echo "A sample of new $REPO_FILE_DIR/$REPO_FILE is placed in $TMP_DIR/$REPO_FILE"
@@ -334,8 +335,8 @@ prepare_debian() {
 repo_replace() {
 	case "$DISTRO_ID" in
 		arch)
-			eval temp_var=\${$MIRROR[@]}
-			check_contains archlinux $temp_var 
+			echo "$MIRROR"
+			if (( ! $ONLINE )); then eval temp_var=\${$MIRROR[@]}; check_contains archlinux $temp_var; fi
 			prepare_archlinux
 			;;
 		debian)	prepare_debian;;
@@ -430,13 +431,21 @@ else
 			-m|--mirror)	shift; MIRROR=$1 ;;
 			-i|--ask)		echo "ask" ;;
 			-R|--refresh)	DO_REFRESH=0;;
+			-U|--offline)	ONLINE=1;; # offline mode
 			--)				shift; break ;;
 		esac
 		shift
 	done
 fi
 
-
+## ONLINE=1
+if (( $ONLINE )); then
+	echo "Please enter the repo URL."
+	echo "Like http://ex.ampl.e"
+	read -p "> " MIRROR
+	repo_replace
+fi
+## ONLINE=0
 ## Check if abbr exists
 
 if [ -z "$MIRROR" ]; then echo "==> Mirror is not specific. Abort..." && exit 1; else check_contains $MIRROR "${mirrors[@]}"; fi

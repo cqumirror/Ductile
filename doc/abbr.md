@@ -4,7 +4,7 @@
 | ----------------------------------- | ----------------------------------------- | ----- | ------------- | -------|
 | http://mirrors.bfsu.edu.cn          | 北京外国语大学开源软件镜像站              | bfsu  | DONE(partial) | |
 | http://mirrors.bupt.edu.cn          | 北京邮电大学开源软件镜像站                | bupt  | DONE(partial) ||
-| http://mirrors.cqu.edu.cn           | 重庆大学开源软件镜像站                    | cqu   | ALL D ||
+| http://mirrors.cqu.edu.cn           | 重庆大学开源软件镜像站                    | cqu   | ALL DONE ||
 | http://mirrors.cqupt.edu.cn         | 重庆邮电大学开源镜像站                    | cqupt |               ||
 | http://mirrors.dgut.edu.cn          | 东莞理工学院 GNU/Linux 协会开源软件镜像站 | dgut  |               ||
 | http://mirrors.neusoft.edu.cn       | 大连东软信息学院开源镜像站                | dnui  |               ||

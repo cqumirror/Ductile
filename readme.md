@@ -8,4 +8,4 @@
 
 Please make an appointment with us , NEVER use `rm` unless you don't even have a few kilobytes of space on your device. Move files to delete to /tmp or somewhere.
 
-请和我们做出约定：永远在这个脚本中使用`rm` 除非你的设备真的连几 KB 空间都挤不出。把准备删掉的文件放到 `/tmp` 或者别处，反正别用 `rm` 除非必须。
+请和我们做出约定：永远不要在这个脚本中使用`rm` 除非你的设备真的连几 KB 空间都挤不出。把准备删掉的文件放到 `/tmp` 或者别处，反正别用 `rm` 除非必须。

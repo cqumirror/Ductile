@@ -13,7 +13,7 @@
 mirrors=(bfsu bupt cqu tuna)
 bfsu=(http://mirrors.bfsu.edu.cn archlinux)
 bupt=(http://mirrors.bupt.edu.cn archlinux)
-cqu=(http://mirrors.cqu.edu.cn archlinux)
+cqu=(http://mirrors.cqu.edu.cn archlinux archlinuxcn alpine centos debian debian-multimedia deepin epel fedora kali linuxmint manjaro opensuse respbian rockylinux ubuntu openwrt)
 tuna=(http://mirrors.tuna.tsinghua.edu.cn archlinux)
 
 # Check distribution

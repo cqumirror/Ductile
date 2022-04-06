@@ -7,6 +7,7 @@
 
 - Arch Linux ( mirrorlist 遵循官方生成列表)
 - Debian ( 完成，`stable`  和 `sid` 测试通过)
+- Fedora ( 未完全测试：未测试第三方仓库 )
 
 - Abbr check: [DOC](<./doc/abbr.md>)
 

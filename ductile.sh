@@ -512,6 +512,70 @@ deb http://security.debian.org/debian-security bullseye-security main contrib no
 	
 }
 
+prepare_fedora() {
+	# Test if baseurl is enabled
+	REPO_FILE_DIR='/etc/yum.repos.d'
+	
+	echo "==> Fedora Detected."
+	echo
+	cd $REPO_FILE_DIR
+	if (( ! $ONLINE )); then eval SITE=\${$MIRROR[0]}; else SITE=$MIRROR; fi
+
+	# if is_test then do (is_test is false), else do (is_test is true)
+	# if ! is_test then do (is_test is ture), else do (is_test is false)
+	
+	if (( $IS_TEST )) ; then
+		REPO_FILE=`grep -i -e "#.*baseurl" *.repo | grep -v "source" | grep -v "debug" | cut -d ":" -f1 | grep -i fedora`
+		if [[ -z $REPO_FILE ]]; then
+			for i in $REPO_FILE
+			do
+				cp $i $i.bak
+				sed -i -e 's/^meta/# meta/' $i
+				sed -i -e "s|^#.*baseurl.*fedora\/linux|baseurl=$SITE/fedora|" $i
+			done
+		else
+			REPO_FILE=`grep -i -e "#.*metalink" *.repo | grep -v "source" | grep -v "debug" | cut -d ":" -f1 | grep -i fedora`
+			for i in $REPO_FILE
+			do
+				cp $i $i.bak
+				sed -i -e "s|^.*baseurl.*fedora\/linux|baseurl=$SITE/fedora|" $i
+			done
+		fi
+		if (( $DO_REFRESH )) ; then echo -e "Do \" sudo dnf makecache \" to update database."; echo && echo "Done"; exit; else sudo dnf makecache; echo && echo "Done"; exit; fi
+	else
+		# verbose mode
+		mkdir -p $TMP_DIR/yum.repos.d
+		REPO_FILE=`grep -i -e "#.*baseurl" *.repo | grep -v "source" | grep -v "debug" | cut -d ":" -f1 | grep -i fedora`
+		if [[ -z $REPO_FILE ]]; then
+			for i in $REPO_FILE
+			do
+				cp $i $TMP_DIR/yum.repos.d/$i
+				sed -i -e 's/^meta/# meta/' $TMP_DIR/yum.repos.d/$i
+				sed -i -e "s|^#.*baseurl.*fedora\/linux|baseurl=$SITE/fedora|" $TMP_DIR/yum.repos.d/$i
+			done
+		else
+			REPO_FILE=`grep -i -e "#.*metalink" *.repo | grep -v "source" | grep -v "debug" | cut -d ":" -f1 | grep -i fedora`
+			for i in $REPO_FILE
+			do
+				cp $i $TMP_DIR/yum.repos.d/$i
+				sed -i -e "s|^.*baseurl.*fedora\/linux|baseurl=$SITE/fedora|" $TMP_DIR/yum.repos.d/$i
+			done
+		fi		
+		if (( $DO_REFRESH )) ; then
+			echo && echo "Done";
+			echo "A set of sample repo files are stored in $TMP_DIR/yum.repos.d/ .";
+			exit;
+		else 
+			echo -e "Do \" sudo dnf makecache \" to update database.";
+			echo "A set of sample repo files are stored in $TMP_DIR/yum.repos.d/ .";
+			echo && echo "Done";
+			exit;
+		fi
+	fi
+	
+}
+
+
 ## TODO
 # Need to expand other distribution ids
 # Steps:
@@ -531,7 +595,10 @@ repo_replace() {
 			prepare_debian
 			;;
 		ubuntu)	echo "pm is apt"; PM=apt; exit;;
-		fedora) echo "pm is dnf"; PM=dnf; exit;;
+		fedora) 
+			if (( ! $ONLINE )); then eval temp_var=\${$MIRROR[@]}; check_contains fedora $temp_var; fi
+			prepare_fedora
+			;;
 		\"opensuse-leap\")	echo "pm is zypp"; exit;;
 		\"opensuse-tumbleweed\")	echo "pm is zypp"; exit;;
 	esac

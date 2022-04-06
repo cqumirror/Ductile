@@ -44,6 +44,6 @@
 | Arch Linux  | archlinux | DONE(paritially) | need update |
 | Debian      | debian    | DONE             |             |
 | OpenSUSE    | opensuse  |                  |             |
-| Fedora      | fedora    |                  |             |
+| Fedora      | fedora    | DONE(particial)
 |             |           |                  |             |
 

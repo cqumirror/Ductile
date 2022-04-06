@@ -2,7 +2,11 @@
 
 > 怕出事所以用中文写警告信息
 
-开发中，现阶段非 Archlinux 用户别用！后面会慢慢在各个发行版上测试，别急
+开发中，现阶段非 Archlinux 用户别用！后面会慢慢在各个发行版上测试，别急。</br>
+已经测试的发行版：
+
+- Arch Linux ( mirrorlist 遵循官方生成列表)
+- Debian ( 未完成，部分测试完成 )
 
 - Abbr check: [DOC](<./doc/abbr.md>)
 

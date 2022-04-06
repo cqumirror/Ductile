@@ -39,8 +39,11 @@
 
 # Distibutions recognized name and abbr
 
-| Distro Name | abbr      | add to list      | Note |
-| ----------- | --------- | ---------------- | ---- |
-| Arch Linux  | archlinux | DONE(paritially) |      |
-|             |           |                  |      |
+| Distro Name | abbr      | add to list      | Note        |
+| ----------- | --------- | ---------------- | ----------- |
+| Arch Linux  | archlinux | DONE(paritially) | need update |
+| Debian      | debian    | DONE             |             |
+| OpenSUSE    | opensuse  |                  |             |
+| Fedora      | fedora    |                  |             |
+|             |           |                  |             |
 

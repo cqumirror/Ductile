@@ -2,4 +2,7 @@
 - [x] Backup of original files
 - [x] Get mirror list, online: from mirrorz or github release? offline: from file or from args?
 - [ ] Supplement with more distributions
-- [ ] Add more sites
+- [x] Add more sites
+- [x] debian
+- [ ] openensuse
+- [ ] archlinux ( need update )

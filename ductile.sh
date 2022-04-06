@@ -24,7 +24,7 @@ TMP_DIR=/tmp
 IS_TEST=1
 DO_REFRESH=1
 ONLINE=0
-
+RECOMMAND=1
 
 ##  Using parseopts from archlinux 
 #   parseopts.sh - getopt_long-like parser
@@ -377,7 +377,9 @@ prepare_debian() {
 	if [[ -z $(grep -i "$CODENAME-security" sources.list | grep -v "#") ]]; then 
 		echo -e "All debian-security lines comment out which is not recommended.";
 		DEBIAN_NO_SEC=0;
-	else 
+	else
+		# If offline mode, disable security to avoid offline issue caused by try to connnect to debian-security official mirror.
+		if (( $ONLINE )); then echo && echo "Enter offline mode, disable debian-security by default"; echo "You can enable debian-security by editing '$REPO_FILE_DIR/$REPO_FILE'."; DEBIAN_NO_SEC=0; fi
 		# Check for main
 		if [[ -z $(grep -i "debian-security" sources.list | grep -v "#" | grep -i "main") ]]; then true; else COMPONENT_SEC+=(main); fi
 		# Check for updates
@@ -396,22 +398,36 @@ prepare_debian() {
 		
 		# Comment all lines for all thirdparty should add lines to /etc/apt/sources.list.d/
 		sed -i -e 's/^/#/' $REPO_FILE_DIR/$REPO_FILE
-		if (( $DEBIAN_NO_BASE )); then
+		if [[ -z $DEBIAN_NO_BASE ]]; then
 			echo "deb $SITE/debian/ $CODENAME $PRE_BASE
-deb-src $SITE/debian/ $CODENAME $PRE_BASE" >> $REPO_FILE
+# deb-src $SITE/debian/ $CODENAME $PRE_BASE" >> $REPO_FILE
 		fi
-		if (( $DEBIAN_NO_UPDATES )); then
+		if [[ -z $DEBIAN_NO_UPDATES ]]; then
 			echo "deb $SITE/debian/ $CODENAME-updates $PRE_UPDATES
-deb-src $SITE/debian/ $CODENAME-updates $PRE_UPDATES" >> $REPO_FILE
+# deb-src $SITE/debian/ $CODENAME-updates $PRE_UPDATES" >> $REPO_FILE
 		fi
-		if (( $DEBIAN_NO_SEC )); then
+		if [[ -z $DEBIAN_NO_SEC ]]; then
 			echo "deb http://security.debian.org/debian-security $CODENAME-security $PRE_SEC
-deb-src http://security.debian.org/debian-security $CODENAME-security $PRE_SEC" >> $REPO_FILE
+# deb-src http://security.debian.org/debian-security $CODENAME-security $PRE_SEC" >> $REPO_FILE
 		fi
-		if (( $DO_REFRESH )) ; then echo -e "Do \" su -c 'apt update' \" to update database if you do not have sudo configured.\nOr using \" sudo apt update \" to update database."; echo && echo "Done"; exit; else su -c 'apt update'; echo && echo "Done"; exit; fi
+		if (( $DO_REFRESH )) ; then echo -e "Do \" su -c 'apt update' \" to update database if you do not have sudo configured.\nOr using \" sudo apt update \" to update database."; echo; echo "'deb-src' lines are disabled by default, you can reenable by editing '$REPO_FILE_DIR/$REPO_FILE'."  && echo "Done"; exit; else su -c 'apt update'; echo ; echo "'deb-src' lines are disabled by default, you can reenable by editing '$REPO_FILE_DIR/$REPO_FILE'." && echo "Done"; exit; fi
 	else
-		
-		if (( $DO_REFRESH )) ; then echo && echo "Done"; exit; else echo -e "Do \" su -c 'apt update' \" to update database if you do not have sudo configured.\nOr using \" sudo apt update \" to update database."; echo && echo "Done"; exit; fi
+		cp $REPO_FILE_DIR/$REPO_FILE $TMP_DIR/$REPO_FILE
+		# Comment all lines for all thirdparty should add lines to /etc/apt/sources.list.d/
+		sed -i -e 's/^/#/' $TMP_DIR/$REPO_FILE
+		if [[ -z $DEBIAN_NO_BASE ]]; then
+			echo "deb $SITE/debian/ $CODENAME $PRE_BASE
+# deb-src $SITE/debian/ $CODENAME $PRE_BASE" >> $TMP_DIR/$REPO_FILE
+		fi
+		if [[ -z $DEBIAN_NO_UPDATES ]]; then
+			echo "deb $SITE/debian/ $CODENAME-updates $PRE_UPDATES
+# deb-src $SITE/debian/ $CODENAME-updates $PRE_UPDATES" >> $TMP_DIR/$REPO_FILE
+		fi
+		if [[ -z $DEBIAN_NO_SEC ]]; then
+			echo "deb http://security.debian.org/debian-security $CODENAME-security $PRE_SEC
+# deb-src http://security.debian.org/debian-security $CODENAME-security $PRE_SEC" >> $TMP_DIR/$REPO_FILE
+		fi
+		if (( $DO_REFRESH )) ; then echo; echo "'deb-src' lines are disabled by default, you can reenable by editing '$REPO_FILE_DIR/$REPO_FILE'."  && echo "Done"; exit; else echo -e "Do \" su -c 'apt update' \" to update database if you do not have sudo configured.\nOr using \" sudo apt update \" to update database."; echo; echo "'deb-src' lines are disabled by default, you can reenable by editing '$REPO_FILE_DIR/$REPO_FILE'."  && echo "Done"; exit; fi
 	fi
 	
 	
@@ -433,7 +449,8 @@ repo_replace() {
 			;;
 		debian)	
 			if (( ! $ONLINE )); then eval temp_var=\${$MIRROR[@]}; check_contains debian $temp_var; fi
-			prepare_debian;;
+			prepare_debian
+			;;
 		ubuntu)	echo "pm is apt"; PM=apt; exit;;
 		fedora) echo "pm is dnf"; PM=dnf; exit;;
 		\"opensuse-leap\")	echo "pm is zypp"; exit;;
@@ -526,6 +543,7 @@ else
 			-i|--ask)		echo "ask" ;;
 			-R|--refresh)	DO_REFRESH=0;;
 			-U|--offline)	ONLINE=1;; # offline mode
+			-r|--recommand)	RECOMMAND=0;; # Never ask why this is false by default...
 			--)				shift; break ;;
 		esac
 		shift

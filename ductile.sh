@@ -428,11 +428,12 @@ deb-src http://security.debian.org/debian-security $CODENAME-security $PRE_SEC" 
 repo_replace() {
 	case "$DISTRO_ID" in
 		arch)
-			echo "$MIRROR"
 			if (( ! $ONLINE )); then eval temp_var=\${$MIRROR[@]}; check_contains archlinux $temp_var; fi
 			prepare_archlinux
 			;;
-		debian)	prepare_debian;;
+		debian)	
+			if (( ! $ONLINE )); then eval temp_var=\${$MIRROR[@]}; check_contains debian $temp_var; fi
+			prepare_debian;;
 		ubuntu)	echo "pm is apt"; PM=apt; exit;;
 		fedora) echo "pm is dnf"; PM=dnf; exit;;
 		\"opensuse-leap\")	echo "pm is zypp"; exit;;
